@@ -51,15 +51,38 @@ class TestUpdateUserData:
     @allure.description('Запрос PATCH на /api/auth/user с новым email и без авторизации вернет 401 Unauthorized')
     def test_update_user_email_with_no_authorization_return_401_unauthorized(self, reg_values):
         new_email = f'abc_{reg_values["email"]}'
-        response = ApiMethods.update_user_data('', {'email': new_email})
+        new_user_data = {'email': new_email}
+        token = ''
+        response = ApiMethods.update_user_data(token, new_user_data)
+
+        assert (response.status_code == ExpectedResponse.UPDATE_USER_DATA_NO_AUTHORIZATION['status_code']
+                and response.json() == ExpectedResponse.UPDATE_USER_DATA_NO_AUTHORIZATION['response_text']), "Ответ сервера не совпадает с ожидаемым"
+
+    @allure.title('Проверка: нельзя изменить пароль неавторизованного пользователя')
+    @allure.description('Запрос PATCH на /api/auth/user с новым password и без авторизации вернет 401 Unauthorized')
+    def test_update_user_password_with_no_authorization_return_401_unauthorized(self, reg_values):
+        new_password = f'abc_{reg_values["password"]}'
+        new_user_data = {'password': new_password}
+        token = ''
+        response = ApiMethods.update_user_data(token, new_user_data)
+
+        assert (response.status_code == ExpectedResponse.UPDATE_USER_DATA_NO_AUTHORIZATION['status_code']
+                and response.json() == ExpectedResponse.UPDATE_USER_DATA_NO_AUTHORIZATION['response_text']), "Ответ сервера не совпадает с ожидаемым"
+
+    @allure.title('Проверка: нельзя изменить имя неавторизованного пользователя')
+    @allure.description('Запрос PATCH на /api/auth/user с новым name и без авторизации вернет 401 Unauthorized')
+    def test_update_user_name_with_no_authorization_return_401_unauthorized(self, reg_values):
+        new_name = f'abc_{reg_values["name"]}'
+        new_user_data = {'name': new_name}
+        token = ''
+        response = ApiMethods.update_user_data(token, new_user_data)
 
         assert (response.status_code == ExpectedResponse.UPDATE_USER_DATA_NO_AUTHORIZATION['status_code']
                 and response.json() == ExpectedResponse.UPDATE_USER_DATA_NO_AUTHORIZATION['response_text']), "Ответ сервера не совпадает с ожидаемым"
 
     @allure.title('Проверка: нельзя изменить email авторизованного пользователя, если новый email уже зарегистрирован')
     @allure.description('Запрос PATCH на /api/auth/user с email, который уже используется, и корректным токеном вернет 403 Forbidden')
-    def test_update_user_email_with_email_that_is_already_used_return_403_forbidden(self, create_user_valid_data,
-                                                                                    reg_values):
+    def test_update_user_email_with_email_that_is_already_used_return_403_forbidden(self, create_user_valid_data, reg_values):
         # Первый пользователь (создан фикстурой)
         email1 = reg_values['email']  # Только email, токен не нужен
 
