@@ -9,11 +9,14 @@ class TestCreateUser:
 
     @allure.title('Проверка: можно создать пользователя')
     @allure.description('Запрос POST на /api/auth/register с валидными данными вернет 200 OK')
-    def test_user_creation_with_valid_data_return_200_ok(self, create_user_valid_data):
-        response = create_user_valid_data
+    def test_user_creation_with_valid_data_return_200_ok(self, reg_values):
+        response = ApiMethods.create_user(reg_values)
 
         assert (response.status_code == ExpectedResponse.USER_CREATION_SUCCESSFULLY['status_code']
                 and CheckResponse.check_create_user_response(response)), "Ответ сервера не совпадает с ожидаемым"
+
+        token = response.json()["accessToken"]
+        ApiMethods.delete_user(token)
 
 
     @allure.title('Проверка: нельзя создать пользователя, который уже зарегистрирован')
